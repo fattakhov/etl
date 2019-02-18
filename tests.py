@@ -1,17 +1,37 @@
 """
 Модуль, содержащий тесты
 """
-
+import configparser
 import unittest
 from readers import CSVReader
 from writers import CSVWriter
+
+CONFIG_PATH = 'settings.ini'
+
+
+def createConfig(path):
+    """
+    Create a config file
+    """
+    config = configparser.ConfigParser()
+
+    config.add_section('')
+    config.set('Settings', "file_name", "./test_csv.csv")
+    config.set('Settings', "write_file_name", "./test_csv.csv")
+    # config.add_section('fmtparams')
+
+
+    with open(path, "w") as config_file:
+        config.write(config_file)
 
 
 class ReaderTestCase(unittest.TestCase):
     """ Тесты reader-объекта """
     def test_csv_reader(self):
-        test_file_name = './test_csv.csv'
-        reader = CSVReader(test_file_name)
+        # test_file_name = './test_csv.csv'
+        config = configparser.ConfigParser()
+        config.read(CONFIG_PATH)
+        reader = CSVReader(config)
         data = list(reader)
         self.assertEqual(len(data), 7)
         self.assertEqual(data[0][0], 'FirstName')
@@ -39,4 +59,5 @@ class PipelineTestCase(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    createConfig(CONFIG_PATH)
     unittest.main()
