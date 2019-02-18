@@ -1,20 +1,50 @@
 """
 Модуль содержит writer`ы библиотеки
-Writer - объект, позволяющиq записывать данные в определенный источник
+Writer - объект, позволяющий записывать данные в определенный источник
 """
+
+import csv
+
 
 class BaseWriter:
     """Базовый класс writer'а
     """
 
-    def __init__(self, *arsg, **kwargs): ...
+    def __init__(self, *args, **kwargs):
+        """
+        args[0] is config
+        :param args:
+        :param kwargs:
+        """
+        self._config = args[0]
 
-    def write(): ...
+
+    def write(self): ...
+
+
+
+class CSVWriter(BaseWriter):
+    """Запись файлов csv
+    Внутри используется стандартная библиотека python csv
+
+    config:
+        file_name str: Название файла csv
+        fmtparams {}: Параметры writer'а csv
+    """
+
+    def __iter__(self):
+        pass
+
+    def write(self, rows):
+        with open(self._config.get('file_name'), mode='w') as csv_file:
+            _writer = csv.writer(csv_file, **self._config.get('fmtparams', {}))
+            for row in rows:
+                _writer.writerow(row)
 
 
 class WriterFactory:
     """Фабрика для создания writer-объектов
-    Позволяет абстрагироваться от самого процесса создание и делегировать
+    Позволяет абстрагироваться от самого процесса создания и делегировать
     создание объекта в более декларативном виде
 
     TODO: необходимо обработать ситуацию, когда нет подходящего reader-класса для чтения.
@@ -28,7 +58,7 @@ class WriterFactory:
     """
 
     writers_mapping = {
-        'csv': CSVReader
+        'csv': CSVWriter
     }
 
     @classmethod
