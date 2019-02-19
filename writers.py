@@ -37,7 +37,7 @@ class CSVWriter(BaseWriter):
 
     def write(self, rows):
         with open(self._config.get('Settings', 'write_file_name'), mode='w') as csv_file:
-            _writer = csv.writer(csv_file, **self._config.get('fmtparams', {}))
+            _writer = csv.writer(csv_file)  #, **self._config.get('fmtparams', {})
             for row in rows:
                 _writer.writerow(row)
 

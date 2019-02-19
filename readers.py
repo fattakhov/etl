@@ -27,7 +27,7 @@ class CSVReader(BaseReader):
 
     def __iter__(self):
         with open(self._config.get('Settings', 'file_name')) as csv_file:
-            _reader = csv.reader(csv_file, **self._config.get('fmtparams', {}))
+            _reader = csv.reader(csv_file) #, **self._config.get('fmtparams', {})
             for row in _reader:
                 yield row
 
