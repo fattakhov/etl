@@ -3,7 +3,7 @@
 """
 
 
-class BaseError(Error):
+class BaseError(Exception):
     """Базовый класс ошибки библиотеки
     """
     pass

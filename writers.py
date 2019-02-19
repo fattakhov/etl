@@ -19,9 +19,7 @@ class BaseWriter:
         """
         self._config = args[0]
 
-
     def write(self): ...
-
 
 
 class CSVWriter(BaseWriter):
@@ -34,11 +32,9 @@ class CSVWriter(BaseWriter):
     """
 
     def write(self, rows):
-        with open(self._config.get('write_file_name'), mode='w') as csv_file:
-            _writer = csv.writer(csv_file, newline='',
-                                 **self._config.get('fmtparams', {}))
+        with open(self._config.get('file_name'), mode='w', newline='') as csv_file:
+            _writer = csv.writer(csv_file)
             for row in rows:
-                print('\n a row', row)
                 _writer.writerow(row)
 
 
@@ -55,13 +51,14 @@ class SQLiteWriter(BaseWriter):
         cur = conn.cursor()
         table_name = self._config['table_name']
 
-        #CREATE TABLE IF NOT EXISTS some_table (id INTEGER PRIMARY KEY AUTOINCREMENT, ...);
+        # CREATE TABLE IF NOT EXISTS some_table (id INTEGER PRIMARY KEY
+        # AUTOINCREMENT, ...);
         # python to sqlite type mapping TODO
         try:
 
             if len(rows) == 0:
                 print('EMPTY DATA')
-                return
+
             else:
                 query = 'INSERT INTO ' + table_name + ' VALUES (' + \
                         ('?,' * len(rows[0]))[:-1] + ')'
@@ -74,10 +71,6 @@ class SQLiteWriter(BaseWriter):
         finally:
             cur.close()
             conn.close()
-
-
-
-
 
 
 class WriterFactory:
@@ -98,7 +91,8 @@ class WriterFactory:
     """
 
     writers_mapping = {
-        'csv': CSVWriter
+        'csv': CSVWriter,
+        'sqlite': SQLiteWriter
     }
 
     @classmethod
