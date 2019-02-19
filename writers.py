@@ -4,6 +4,7 @@ Writer - объект, позволяющий записывать данные 
 """
 
 import csv
+import sqlite3
 
 
 class BaseWriter:
@@ -32,14 +33,41 @@ class CSVWriter(BaseWriter):
         fmtparams {}: Параметры writer'а csv
     """
 
-    def __iter__(self):
-        pass
-
     def write(self, rows):
-        with open(self._config.get('Settings', 'write_file_name'), mode='w') as csv_file:
-            _writer = csv.writer(csv_file)  #, **self._config.get('fmtparams', {})
+        with open(self._config.get('write_file_name'), mode='w') as csv_file:
+            _writer = csv.writer(csv_file, newline='',
+                                 **self._config.get('fmtparams', {}))
             for row in rows:
+                print('\n a row', row)
                 _writer.writerow(row)
+
+
+class SQLiteWriter(BaseWriter):
+    """
+    Запись данных в базу данных SQLite
+
+    config:
+        db_name: имя базы данных
+
+    """
+    def write(self, rows):
+        conn = sqlite3.connect(self._config['db_name'])
+        cur = conn.cursor()
+        table_name = self._config['table_name']
+        if len(rows) == 0:
+            print('EMPTY DATA')
+            return
+        else:
+            query = 'INSERT INTO ' + table_name + ' VALUES (' + \
+                    ('?,' * len(rows[0]))[:-1] + ')'
+            print('Query ', query)
+            cur.executemany(query, rows)
+
+
+
+
+
+
 
 
 class WriterFactory:
@@ -47,9 +75,11 @@ class WriterFactory:
     Позволяет абстрагироваться от самого процесса создания и делегировать
     создание объекта в более декларативном виде
 
-    TODO: необходимо обработать ситуацию, когда нет подходящего reader-класса для чтения.
+    TODO: необходимо обработать ситуацию, когда нет подходящего reader-класса
+    для чтения.
     Выдать соответсвующую ошибку через WriterError
-    Например: WriterFactory.create({'type': 'json'}) должен выдать корректную ошибку об отсутствии JSONWriter
+    Например: WriterFactory.create({'type': 'json'}) должен выдать корректную
+    ошибку об отсутствии JSONWriter
 
     .. code:: python
         

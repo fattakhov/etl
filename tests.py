@@ -51,11 +51,12 @@ class WriterTestCase(unittest.TestCase):
 
     def test_csv_writer(self):
         config = configparser.ConfigParser()
-        config = list(config.read(CONFIG_PATH))
+        config.read(CONFIG_PATH)
 
         reader = CSVReader(config)
-        rows = list(reader.read())
-
+        rows = list(reader)
+        print('\n rows:')
+        print(rows)
         writer = CSVWriter(config)
         writer.write(rows)
         config.set('Settings', "file_name", "./write_test_csv.csv")
