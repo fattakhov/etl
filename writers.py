@@ -54,16 +54,26 @@ class SQLiteWriter(BaseWriter):
         conn = sqlite3.connect(self._config['db_name'])
         cur = conn.cursor()
         table_name = self._config['table_name']
-        if len(rows) == 0:
-            print('EMPTY DATA')
-            return
-        else:
-            query = 'INSERT INTO ' + table_name + ' VALUES (' + \
-                    ('?,' * len(rows[0]))[:-1] + ')'
-            print('Query ', query)
-            cur.executemany(query, rows)
 
+        #CREATE TABLE IF NOT EXISTS some_table (id INTEGER PRIMARY KEY AUTOINCREMENT, ...);
+        # python to sqlite type mapping TODO
+        try:
 
+            if len(rows) == 0:
+                print('EMPTY DATA')
+                return
+            else:
+                query = 'INSERT INTO ' + table_name + ' VALUES (' + \
+                        ('?,' * len(rows[0]))[:-1] + ')'
+                print('Query ', query)
+                cur.executemany(query, rows)
+                conn.commit()
+
+        except sqlite3.Error as e:
+            print("An SQLite error occurred:", e.args[0])
+        finally:
+            cur.close()
+            conn.close()
 
 
 
